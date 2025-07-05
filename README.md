@@ -1,13 +1,60 @@
-# StudyBuddy
+# StudyBuddy - CBSE Class 10 Study Platform
 
-StudyBuddy is a minimalist educational platform designed for CBSE Class 10 students. It provides easy access to official NCERT textbook PDFs with a clean, distraction-free interface.
+A comprehensive, distraction-free study platform for CBSE Class 10 students featuring NCERT resources, curated notes, study tools, and more.
 
 ## Features
 
-- **Class 10 NCERT Subjects**: Complete coverage of Mathematics, Science, English, Hindi, and Social Science
-- **Collapsible Subject Sections**: Clean organization with expandable subject areas
-- **Direct PDF Links**: One-click access to official NCERT chapter PDFs
-- **Minimalist Design**: Black and white color scheme to minimize distractions
+- 📚 **Complete NCERT Resources**: All subjects with official PDF links
+- 📝 **Curated Study Notes**: 80+ high-quality notes from reputable sources
+- ⏱️ **Pomodoro Timer**: Built-in study timer with session tracking
+- 🔖 **Bookmarks & History**: Save and track your study progress
+- 🔍 **Advanced Search**: Find subjects, chapters, and notes quickly
+- 🌓 **Dark/Light Mode**: Comfortable studying in any environment
+- 📱 **Responsive Design**: Works perfectly on all devices
+- ⚡ **Fast & Lightweight**: Built with Vite and React for optimal performance
+
+## Subjects Covered
+
+- **Mathematics**: All 15 chapters from Real Numbers to Probability
+- **Science**: Physics, Chemistry, and Biology with comprehensive coverage
+- **English**: Literature analysis, writing skills, and grammar
+- **Hindi (Sparsh)**: Major poets, literary works, and language concepts
+- **Social Science**: History, Civics, Geography, and Economics
+
+## Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## Deployment
+
+This project is optimized for Vercel deployment:
+
+1. Push your code to GitHub/GitLab/Bitbucket
+2. Connect your repository to [Vercel](https://vercel.com)
+3. Deploy with one click - Vercel auto-detects Vite configuration
+
+## Technology Stack
+
+- **Frontend**: React 18, Vite
+- **Styling**: Tailwind CSS
+- **Build Tool**: Vite
+- **Deployment**: Vercel-ready
+
+## Contributing
+
+Feel free to contribute by adding more curated notes, improving the UI, or suggesting new features!
 - **Mobile Responsive**: Works seamlessly on all device sizes
 - **Educational Focus**: Designed specifically for student productivity
 
