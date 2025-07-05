@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { storage, searchUtils } from '../utils/helpers';
+import StudyTimer from './StudyTimer';
 
 const subjectsData = {
   mathematics: {
@@ -146,7 +148,70 @@ const subjectsData = {
   }
 };
 
-const SubjectCard = ({ subject, subjectKey, isOpen, onToggle, isDark }) => {
+const SubjectCard = ({ subject, subjectKey, isOpen, onToggle, isDark, searchTerm }) => {
+  const addToBookmarks = (chapter, subjectName) => {
+    const bookmarks = storage.get('studybuddy-bookmarks', []);
+    const bookmark = {
+      id: Date.now().toString(),
+      title: chapter.name,
+      subject: subjectName,
+      pdfUrl: chapter.pdfUrl,
+      date: new Date().toISOString()
+    };
+    
+    // Check if already bookmarked
+    const exists = bookmarks.some(b => b.title === chapter.name && b.subject === subjectName);
+    if (!exists) {
+      bookmarks.unshift(bookmark);
+      storage.set('studybuddy-bookmarks', bookmarks);
+    }
+  };
+
+  const addToHistory = (chapter, subjectName) => {
+    const history = storage.get('studybuddy-history', []);
+    const historyItem = {
+      id: Date.now().toString(),
+      title: chapter.name,
+      subject: subjectName,
+      pdfUrl: chapter.pdfUrl,
+      date: new Date().toISOString()
+    };
+    
+    // Remove duplicate if exists
+    const filteredHistory = history.filter(h => !(h.title === chapter.name && h.subject === subjectName));
+    filteredHistory.unshift(historyItem);
+    
+    // Keep only last 50 items
+    const limitedHistory = filteredHistory.slice(0, 50);
+    storage.set('studybuddy-history', limitedHistory);
+    
+    // Update study history for streaks
+    const studyHistory = storage.get('studybuddy-study-history', []);
+    const today = new Date().toDateString();
+    const todayExists = studyHistory.some(entry => new Date(entry.date).toDateString() === today);
+    
+    if (!todayExists) {
+      studyHistory.push({ date: new Date().toISOString() });
+      storage.set('studybuddy-study-history', studyHistory);
+    }
+  };
+
+  const handlePDFClick = (chapter, subjectName) => {
+    addToHistory(chapter, subjectName);
+  };
+
+  const isBookmarked = (chapter, subjectName) => {
+    const bookmarks = storage.get('studybuddy-bookmarks', []);
+    return bookmarks.some(b => b.title === chapter.name && b.subject === subjectName);
+  };
+
+  const filteredChapters = (chapters) => {
+    if (!searchTerm) return chapters;
+    return chapters.filter(chapter => 
+      searchUtils.searchInText(chapter.name, searchTerm)
+    );
+  };
+
   return (
     <div className={`border rounded-lg mb-4 shadow-sm ${isDark ? 'border-gray-800' : 'border-gray-300'}`}>
       <button
@@ -174,53 +239,108 @@ const SubjectCard = ({ subject, subjectKey, isOpen, onToggle, isDark }) => {
           {subject.subparts ? (
             // Science with subparts (Physics, Chemistry, Biology)
             <div className="space-y-6">
-              {Object.entries(subject.subparts).map(([subpartKey, subpart]) => (
-                <div key={subpartKey} className={`border-l-2 pl-4 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-                  <h3 className={`text-lg font-medium mb-3 ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>{subpart.name}</h3>
-                  <div className="space-y-2">
-                    {subpart.chapters.map((chapter, index) => (
-                      <div key={index} className={`flex justify-between items-center py-2 border-b last:border-b-0 ${
-                        isDark ? 'border-gray-700' : 'border-gray-100'
-                      }`}>
-                        <span className={`flex-1 text-sm ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>{chapter.name}</span>
-                        <a
-                          href={chapter.pdfUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`ml-4 px-3 py-1 rounded-md transition-colors focus:outline-none focus:ring-2 text-xs ${
-                            isDark 
-                              ? 'bg-white text-black hover:bg-gray-200 focus:ring-gray-600' 
-                              : 'bg-black text-white hover:bg-gray-800 focus:ring-gray-400'
-                          }`}
-                        >
-                          View PDF
-                        </a>
-                      </div>
-                    ))}
+              {Object.entries(subject.subparts).map(([subpartKey, subpart]) => {
+                const filteredSubpartChapters = filteredChapters(subpart.chapters);
+                if (filteredSubpartChapters.length === 0 && searchTerm) return null;
+                
+                return (
+                  <div key={subpartKey} className={`border-l-2 pl-4 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+                    <h3 className={`text-lg font-medium mb-3 ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>{subpart.name}</h3>
+                    <div className="space-y-2">
+                      {filteredSubpartChapters.map((chapter, index) => (
+                        <div key={index} className={`flex justify-between items-center py-2 border-b last:border-b-0 ${
+                          isDark ? 'border-gray-700' : 'border-gray-100'
+                        }`}>
+                          <span 
+                            className={`flex-1 text-sm ${isDark ? 'text-gray-200' : 'text-gray-700'}`}
+                            dangerouslySetInnerHTML={{ 
+                              __html: searchTerm ? searchUtils.highlightText(chapter.name, searchTerm) : chapter.name 
+                            }}
+                          />
+                          <div className="flex items-center space-x-2 ml-4">
+                            <button
+                              onClick={() => addToBookmarks(chapter, subpart.name)}
+                              className={`p-1 rounded-md transition-colors focus:outline-none focus:ring-2 ${
+                                isBookmarked(chapter, subpart.name)
+                                  ? isDark
+                                    ? 'text-yellow-400 hover:text-yellow-300 focus:ring-gray-600'
+                                    : 'text-yellow-600 hover:text-yellow-700 focus:ring-gray-400'
+                                  : isDark
+                                    ? 'text-gray-400 hover:text-yellow-400 focus:ring-gray-600'
+                                    : 'text-gray-500 hover:text-yellow-600 focus:ring-gray-400'
+                              }`}
+                              title={isBookmarked(chapter, subpart.name) ? 'Bookmarked' : 'Add to bookmarks'}
+                            >
+                              <svg className="w-4 h-4" fill={isBookmarked(chapter, subpart.name) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                              </svg>
+                            </button>
+                            <a
+                              href={chapter.pdfUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => handlePDFClick(chapter, subpart.name)}
+                              className={`px-3 py-1 rounded-md transition-colors focus:outline-none focus:ring-2 text-xs ${
+                                isDark 
+                                  ? 'bg-white text-black hover:bg-gray-200 focus:ring-gray-600' 
+                                  : 'bg-black text-white hover:bg-gray-800 focus:ring-gray-400'
+                              }`}
+                            >
+                              View PDF
+                            </a>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             // Regular subjects with direct chapters
             <div className="space-y-3">
-              {subject.chapters.map((chapter, index) => (
+              {filteredChapters(subject.chapters).map((chapter, index) => (
                 <div key={index} className={`flex justify-between items-center py-2 border-b last:border-b-0 ${
                   isDark ? 'border-gray-700' : 'border-gray-100'
                 }`}>
-                  <span className={`flex-1 ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>{chapter.name}</span>
-                  <a
-                    href={chapter.pdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`ml-4 px-4 py-2 rounded-md transition-colors focus:outline-none focus:ring-2 text-sm ${
-                      isDark 
-                        ? 'bg-white text-black hover:bg-gray-200 focus:ring-gray-600' 
-                        : 'bg-black text-white hover:bg-gray-800 focus:ring-gray-400'
-                    }`}
-                  >
-                    View PDF
-                  </a>
+                  <span 
+                    className={`flex-1 ${isDark ? 'text-gray-100' : 'text-gray-800'}`}
+                    dangerouslySetInnerHTML={{ 
+                      __html: searchTerm ? searchUtils.highlightText(chapter.name, searchTerm) : chapter.name 
+                    }}
+                  />
+                  <div className="flex items-center space-x-2 ml-4">
+                    <button
+                      onClick={() => addToBookmarks(chapter, subject.name)}
+                      className={`p-1 rounded-md transition-colors focus:outline-none focus:ring-2 ${
+                        isBookmarked(chapter, subject.name)
+                          ? isDark
+                            ? 'text-yellow-400 hover:text-yellow-300 focus:ring-gray-600'
+                            : 'text-yellow-600 hover:text-yellow-700 focus:ring-gray-400'
+                          : isDark
+                            ? 'text-gray-400 hover:text-yellow-400 focus:ring-gray-600'
+                            : 'text-gray-500 hover:text-yellow-600 focus:ring-gray-400'
+                      }`}
+                      title={isBookmarked(chapter, subject.name) ? 'Bookmarked' : 'Add to bookmarks'}
+                    >
+                      <svg className="w-4 h-4" fill={isBookmarked(chapter, subject.name) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                    </button>
+                    <a
+                      href={chapter.pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => handlePDFClick(chapter, subject.name)}
+                      className={`px-4 py-2 rounded-md transition-colors focus:outline-none focus:ring-2 text-sm ${
+                        isDark 
+                          ? 'bg-white text-black hover:bg-gray-200 focus:ring-gray-600' 
+                          : 'bg-black text-white hover:bg-gray-800 focus:ring-gray-400'
+                      }`}
+                    >
+                      View PDF
+                    </a>
+                  </div>
                 </div>
               ))}
             </div>
@@ -231,26 +351,8 @@ const SubjectCard = ({ subject, subjectKey, isOpen, onToggle, isDark }) => {
   );
 };
 
-const NCERTSubjects = () => {
+const NCERTSubjects = ({ searchTerm, isDark }) => {
   const [openSubjects, setOpenSubjects] = useState({});
-  const [isDark, setIsDark] = useState(false);
-
-  // Load theme preference from localStorage on component mount
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('studybuddy-theme');
-    if (savedTheme) {
-      setIsDark(savedTheme === 'dark');
-    } else {
-      // Check system preference
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setIsDark(prefersDark);
-    }
-  }, []);
-
-  // Save theme preference to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('studybuddy-theme', isDark ? 'dark' : 'light');
-  }, [isDark]);
 
   const toggleSubject = (subjectKey) => {
     setOpenSubjects(prev => ({
@@ -259,46 +361,51 @@ const NCERTSubjects = () => {
     }));
   };
 
-  const toggleTheme = () => {
-    setIsDark(!isDark);
+  // Filter subjects based on search term
+  const getFilteredSubjects = () => {
+    if (!searchTerm) return subjectsData;
+    
+    const filtered = {};
+    Object.entries(subjectsData).forEach(([key, subject]) => {
+      const hasMatchingChapters = subject.subparts 
+        ? Object.values(subject.subparts).some(subpart =>
+            subpart.chapters.some(chapter => 
+              searchUtils.searchInText(chapter.name, searchTerm)
+            )
+          )
+        : subject.chapters.some(chapter => 
+            searchUtils.searchInText(chapter.name, searchTerm)
+          );
+      
+      const hasMatchingSubject = searchUtils.searchInText(subject.name, searchTerm);
+      
+      if (hasMatchingChapters || hasMatchingSubject) {
+        filtered[key] = subject;
+      }
+    });
+    
+    return filtered;
   };
 
-  return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      isDark ? 'bg-black' : 'bg-white'
-    }`}>
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Header with Theme Toggle */}
-        <header className="text-center mb-8 relative">
-          <h1 className={`text-4xl font-bold mb-2 ${isDark ? 'text-white' : 'text-black'}`}>StudyBuddy</h1>
-          <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Class 10 NCERT Textbooks</p>
-          
-          {/* Theme Toggle Button */}
-          <button
-            onClick={toggleTheme}
-            className={`absolute top-0 right-0 p-3 rounded-full transition-colors focus:outline-none focus:ring-2 ${
-              isDark 
-                ? 'bg-gray-900 hover:bg-gray-800 focus:ring-gray-600 text-yellow-400' 
-                : 'bg-gray-100 hover:bg-gray-200 focus:ring-gray-400 text-gray-800'
-            }`}
-            aria-label="Toggle theme"
-          >
-            {isDark ? (
-              // Sun icon for light mode
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
-              </svg>
-            ) : (
-              // Moon icon for dark mode
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-              </svg>
-            )}
-          </button>
-        </header>
+  const filteredSubjects = getFilteredSubjects();
 
-        <div className="space-y-4">
-          {Object.entries(subjectsData).map(([key, subject]) => (
+  return (
+    <div className="space-y-6">
+      {/* Study Timer */}
+      <StudyTimer isDark={isDark} />
+      
+      {/* Subjects List */}
+      <div className="space-y-4">
+        {Object.keys(filteredSubjects).length === 0 ? (
+          <div className={`text-center py-12 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <p className="text-lg mb-2">No results found</p>
+            <p className="text-sm">Try searching for a different term</p>
+          </div>
+        ) : (
+          Object.entries(filteredSubjects).map(([key, subject]) => (
             <SubjectCard
               key={key}
               subject={subject}
@@ -306,29 +413,10 @@ const NCERTSubjects = () => {
               isOpen={openSubjects[key] || false}
               onToggle={() => toggleSubject(key)}
               isDark={isDark}
+              searchTerm={searchTerm}
             />
-          ))}
-        </div>
-        
-        {/* Disclaimer Footer */}
-        <footer className={`mt-12 pt-8 border-t ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
-          <div className={`rounded-lg p-6 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
-            <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-200' : 'text-gray-600'}`}>
-              <strong>Disclaimer:</strong> All textbook links are sourced from the official NCERT website (
-              <a 
-                href="https://ncert.nic.in" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className={`underline transition-colors ${
-                  isDark ? 'text-white hover:text-gray-300' : 'text-black hover:text-gray-800'
-                }`}
-              >
-                https://ncert.nic.in
-              </a>
-              ). We do not host or modify any content. This platform is created solely for educational convenience.
-            </p>
-          </div>
-        </footer>
+          ))
+        )}
       </div>
     </div>
   );
