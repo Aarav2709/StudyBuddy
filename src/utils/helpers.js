@@ -1,4 +1,3 @@
-// Local storage utilities
 export const storage = {
   get: (key, defaultValue = null) => {
     try {
@@ -27,7 +26,6 @@ export const storage = {
   }
 };
 
-// Date utilities
 export const dateUtils = {
   formatDate: (date) => {
     return new Intl.DateTimeFormat('en-US', {
@@ -48,7 +46,6 @@ export const dateUtils = {
   }
 };
 
-// Search utilities
 export const searchUtils = {
   highlightText: (text, searchTerm) => {
     if (!searchTerm) return text;
@@ -61,7 +58,6 @@ export const searchUtils = {
   }
 };
 
-// Progress utilities
 export const progressUtils = {
   calculateProgress: (completed, total) => {
     return total > 0 ? Math.round((completed / total) * 100) : 0;
@@ -87,7 +83,6 @@ export const progressUtils = {
     let longestStreak = 0;
     let tempStreak = 0;
     
-    // Check current streak
     let checkDate = new Date(today);
     for (let i = 0; i < sortedDates.length; i++) {
       if (sortedDates[i].getTime() === checkDate.getTime()) {
@@ -98,7 +93,6 @@ export const progressUtils = {
       }
     }
     
-    // Calculate longest streak
     for (let i = 0; i < sortedDates.length; i++) {
       if (i === 0) {
         tempStreak = 1;
@@ -118,7 +112,6 @@ export const progressUtils = {
   }
 };
 
-// Timer utilities
 export const timerUtils = {
   formatTime: (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -127,7 +120,6 @@ export const timerUtils = {
   },
   
   playNotificationSound: () => {
-    // Create a simple beep sound
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
@@ -146,7 +138,6 @@ export const timerUtils = {
   }
 };
 
-// Notification utilities
 export const notificationUtils = {
   requestPermission: async () => {
     if ('Notification' in window) {

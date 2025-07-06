@@ -7,7 +7,6 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
     notifications: true,
     soundEnabled: true,
     autoBreakReminder: true,
-    studyGoal: 5,
     pomodoroLength: 25,
     shortBreakLength: 5,
     longBreakLength: 15,
@@ -29,7 +28,6 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
       notifications: storage.get('studybuddy-notifications', true),
       soundEnabled: storage.get('studybuddy-sound', true),
       autoBreakReminder: storage.get('studybuddy-break-reminder', true),
-      studyGoal: storage.get('studybuddy-daily-goal', 5),
       pomodoroLength: storage.get('studybuddy-pomodoro-length', 25),
       shortBreakLength: storage.get('studybuddy-short-break', 5),
       longBreakLength: storage.get('studybuddy-long-break', 15),
@@ -79,7 +77,6 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
       try {
         const data = JSON.parse(e.target.result);
         
-        // Restore data
         if (data.bookmarks) storage.set('studybuddy-bookmarks', data.bookmarks);
         if (data.history) storage.set('studybuddy-history', data.history);
         if (data.notes) storage.set('studybuddy-notes', data.notes);
@@ -87,7 +84,6 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
         if (data.timerSessions) storage.set('studybuddy-timer-sessions', data.timerSessions);
         if (data.studyHistory) storage.set('studybuddy-study-history', data.studyHistory);
         
-        // Restore settings
         if (data.settings) {
           Object.entries(data.settings).forEach(([key, value]) => {
             storage.set(`studybuddy-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`, value);
@@ -104,7 +100,6 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
   };
 
   const resetAllData = () => {
-    // Clear all localStorage data
     const keys = [
       'studybuddy-theme', 'studybuddy-bookmarks', 'studybuddy-history',
       'studybuddy-notes', 'studybuddy-progress', 'studybuddy-timer-sessions',
@@ -116,7 +111,6 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
     
     keys.forEach(key => storage.remove(key));
     
-    // Reset to defaults
     loadSettings();
     setShowResetModal(false);
     
@@ -127,18 +121,18 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
     <div className={`p-4 rounded-lg border ${
       isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
     }`}>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex-1">
-          <h3 className={`font-medium ${isDark ? 'text-white' : 'text-black'}`}>
+          <h3 className={`font-medium text-sm sm:text-base ${isDark ? 'text-white' : 'text-black'}`}>
             {title}
           </h3>
           {description && (
-            <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               {description}
             </p>
           )}
         </div>
-        <div className="ml-4">
+        <div className="flex-shrink-0 self-start sm:self-center">
           {children}
         </div>
       </div>
@@ -151,7 +145,7 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
         Settings
       </h2>
 
-      {/* Appearance */}
+      
       <div className="space-y-4">
         <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-black'}`}>
           Appearance
@@ -159,7 +153,7 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
         
         <SettingRow
           title="Dark Mode"
-          description="Toggle between light and dark themes"
+          description="Toggle between light and dark themes."
         >
           <button
             onClick={onThemeToggle}
@@ -175,7 +169,7 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
 
         <SettingRow
           title="Compact Mode"
-          description="Reduce spacing and padding for more content"
+          description="Reduce spacing and padding for more content."
         >
           <button
             onClick={() => updateSetting('compactMode', !settings.compactMode)}
@@ -192,39 +186,20 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
         </SettingRow>
       </div>
 
-      {/* Study Settings */}
+      
       <div className="space-y-4">
         <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-black'}`}>
-          Study Settings
+          Study Timer Settings
         </h3>
         
         <SettingRow
-          title="Daily Study Goal"
-          description="Number of chapters to complete daily"
-        >
-          <select
-            value={settings.studyGoal}
-            onChange={(e) => updateSetting('studyGoal', parseInt(e.target.value))}
-            className={`px-3 py-1 rounded-md border transition-colors focus:outline-none focus:ring-2 ${
-              isDark 
-                ? 'bg-gray-800 border-gray-600 text-white focus:ring-gray-500' 
-                : 'bg-white border-gray-300 text-gray-900 focus:ring-gray-400'
-            }`}
-          >
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-              <option key={num} value={num}>{num} chapters</option>
-            ))}
-          </select>
-        </SettingRow>
-
-        <SettingRow
           title="Pomodoro Length"
-          description="Duration of focus sessions in minutes"
+          description="Duration of focus sessions in minutes."
         >
           <select
             value={settings.pomodoroLength}
             onChange={(e) => updateSetting('pomodoroLength', parseInt(e.target.value))}
-            className={`px-3 py-1 rounded-md border transition-colors focus:outline-none focus:ring-2 ${
+            className={`px-3 py-1 rounded-md border transition-colors focus:outline-none focus:ring-2 text-sm ${
               isDark 
                 ? 'bg-gray-800 border-gray-600 text-white focus:ring-gray-500' 
                 : 'bg-white border-gray-300 text-gray-900 focus:ring-gray-400'
@@ -238,12 +213,12 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
 
         <SettingRow
           title="Short Break Length"
-          description="Duration of short breaks in minutes"
+          description="Duration of short breaks in minutes."
         >
           <select
             value={settings.shortBreakLength}
             onChange={(e) => updateSetting('shortBreakLength', parseInt(e.target.value))}
-            className={`px-3 py-1 rounded-md border transition-colors focus:outline-none focus:ring-2 ${
+            className={`px-3 py-1 rounded-md border transition-colors focus:outline-none focus:ring-2 text-sm ${
               isDark 
                 ? 'bg-gray-800 border-gray-600 text-white focus:ring-gray-500' 
                 : 'bg-white border-gray-300 text-gray-900 focus:ring-gray-400'
@@ -256,7 +231,7 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
         </SettingRow>
       </div>
 
-      {/* Notifications */}
+      
       <div className="space-y-4">
         <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-black'}`}>
           Notifications
@@ -264,7 +239,7 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
         
         <SettingRow
           title="Sound Notifications"
-          description="Play sound when timer completes"
+          description="Play sound when timer completes."
         >
           <button
             onClick={() => updateSetting('soundEnabled', !settings.soundEnabled)}
@@ -282,7 +257,7 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
 
         <SettingRow
           title="Break Reminders"
-          description="Automatically suggest breaks after study sessions"
+          description="Automatically suggest breaks after study sessions."
         >
           <button
             onClick={() => updateSetting('autoBreakReminder', !settings.autoBreakReminder)}
@@ -299,7 +274,7 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
         </SettingRow>
       </div>
 
-      {/* Data Management */}
+      
       <div className="space-y-4">
         <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-black'}`}>
           Data Management
@@ -307,11 +282,11 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
         
         <SettingRow
           title="Export Data"
-          description="Download all your study data as a backup"
+          description="Download all your study data as a backup."
         >
           <button
             onClick={exportData}
-            className={`px-4 py-2 rounded-lg border transition-colors focus:outline-none focus:ring-2 ${
+            className={`px-4 py-2 rounded-lg border transition-colors focus:outline-none focus:ring-2 text-sm ${
               isDark 
                 ? 'border-gray-600 text-gray-300 hover:bg-gray-800 focus:ring-gray-600' 
                 : 'border-gray-300 text-gray-600 hover:bg-gray-50 focus:ring-gray-400'
@@ -323,9 +298,9 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
 
         <SettingRow
           title="Import Data"
-          description="Restore data from a previous backup"
+          description="Restore data from a previous backup."
         >
-          <label className={`px-4 py-2 rounded-lg border cursor-pointer transition-colors focus-within:ring-2 ${
+          <label className={`px-4 py-2 rounded-lg border cursor-pointer transition-colors focus-within:ring-2 text-sm ${
             isDark 
               ? 'border-gray-600 text-gray-300 hover:bg-gray-800 focus-within:ring-gray-600' 
               : 'border-gray-300 text-gray-600 hover:bg-gray-50 focus-within:ring-gray-400'
@@ -342,11 +317,11 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
 
         <SettingRow
           title="Reset All Data"
-          description="Clear all data and return to defaults"
+          description="Clear all data and return to defaults."
         >
           <button
             onClick={() => setShowResetModal(true)}
-            className={`px-4 py-2 rounded-lg border transition-colors focus:outline-none focus:ring-2 ${
+            className={`px-4 py-2 rounded-lg border transition-colors focus:outline-none focus:ring-2 text-sm ${
               isDark 
                 ? 'border-red-600 text-red-400 hover:bg-red-900 hover:bg-opacity-20 focus:ring-red-600' 
                 : 'border-red-300 text-red-600 hover:bg-red-50 focus:ring-red-400'
@@ -357,7 +332,7 @@ const SettingsPanel = ({ isDark, onThemeToggle }) => {
         </SettingRow>
       </div>
 
-      {/* Reset Confirmation Modal */}
+      
       {showResetModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className={`max-w-md w-full rounded-lg p-6 ${

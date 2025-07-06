@@ -34,10 +34,8 @@ const NotesPanel = ({ isDark }) => {
     let allNotes = [];
 
     if (searchTerm.trim()) {
-      // Search across all notes
       allNotes = searchCuratedNotes(searchTerm);
     } else if (selectedSubject === 'all') {
-      // Get all notes from all subjects
       subjects.slice(1).forEach(subject => {
         const subjectNotes = getCuratedNotes(subject.key);
         subjectNotes.forEach(note => {
@@ -45,14 +43,12 @@ const NotesPanel = ({ isDark }) => {
         });
       });
     } else {
-      // Get notes for selected subject
       allNotes = getCuratedNotes(selectedSubject).map(note => ({
         ...note,
         subject: selectedSubject
       }));
     }
 
-    // Filter by difficulty
     if (selectedDifficulty !== 'all') {
       allNotes = allNotes.filter(note => note.difficulty === selectedDifficulty);
     }
@@ -107,7 +103,7 @@ const NotesPanel = ({ isDark }) => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      
       <div className="flex flex-col gap-4">
         <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>
           Curated Study Notes
@@ -117,9 +113,9 @@ const NotesPanel = ({ isDark }) => {
         </p>
       </div>
 
-      {/* Filters */}
+      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Search */}
+        
         <div className="relative">
           <svg 
             className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
@@ -144,7 +140,7 @@ const NotesPanel = ({ isDark }) => {
           />
         </div>
 
-        {/* Subject Filter */}
+        
         <select
           value={selectedSubject}
           onChange={(e) => setSelectedSubject(e.target.value)}
@@ -161,7 +157,7 @@ const NotesPanel = ({ isDark }) => {
           ))}
         </select>
 
-        {/* Difficulty Filter */}
+        
         <select
           value={selectedDifficulty}
           onChange={(e) => setSelectedDifficulty(e.target.value)}
@@ -179,7 +175,7 @@ const NotesPanel = ({ isDark }) => {
         </select>
       </div>
 
-      {/* Notes Grid */}
+      
       {notes.length === 0 ? (
         <div className={`text-center py-12 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
           <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,7 +195,7 @@ const NotesPanel = ({ isDark }) => {
                   : 'bg-white border-gray-200 hover:border-gray-300'
               }`}
             >
-              {/* Note Header */}
+              
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <h3 className={`font-semibold mb-1 ${isDark ? 'text-white' : 'text-black'}`}>
@@ -233,12 +229,12 @@ const NotesPanel = ({ isDark }) => {
                 </button>
               </div>
 
-              {/* Note Content */}
+              
               <div className={`text-sm leading-relaxed mb-3 ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
                 {note.content}
               </div>
 
-              {/* Tags */}
+              
               {note.tags && note.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-3">
                   {note.tags.map((tag, index) => (
@@ -256,7 +252,7 @@ const NotesPanel = ({ isDark }) => {
                 </div>
               )}
 
-              {/* Source */}
+              
               <div className="flex justify-between items-center">
                 <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                   Source: {note.source}
@@ -281,7 +277,7 @@ const NotesPanel = ({ isDark }) => {
         </div>
       )}
 
-      {/* Stats */}
+      
       <div className={`text-center text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
         Showing {notes.length} curated note{notes.length !== 1 ? 's' : ''}
         {bookmarkedNotes.size > 0 && (

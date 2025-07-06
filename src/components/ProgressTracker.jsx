@@ -3,10 +3,7 @@ import { storage } from '../utils/helpers';
 
 const ProgressTracker = ({ isDark }) => {
   const [progress, setProgress] = useState({});
-  const [dailyGoal, setDailyGoal] = useState(5); // chapters per day
-  const [showGoalModal, setShowGoalModal] = useState(false);
 
-  // Subject data structure for progress tracking
   const subjects = {
     mathematics: { name: 'Mathematics', totalChapters: 15 },
     physics: { name: 'Physics', totalChapters: 4 },
@@ -23,9 +20,7 @@ const ProgressTracker = ({ isDark }) => {
 
   useEffect(() => {
     const savedProgress = storage.get('studybuddy-progress', {});
-    const savedGoal = storage.get('studybuddy-daily-goal', 5);
     setProgress(savedProgress);
-    setDailyGoal(savedGoal);
   }, []);
 
   const toggleChapterCompletion = (subject, chapterIndex) => {
@@ -64,32 +59,15 @@ const ProgressTracker = ({ isDark }) => {
     };
   };
 
-  const updateDailyGoal = () => {
-    storage.set('studybuddy-daily-goal', dailyGoal);
-    setShowGoalModal(false);
-  };
-
   const totalProgress = getTotalProgress();
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>
-          Study Progress
-        </h2>
-        <button
-          onClick={() => setShowGoalModal(true)}
-          className={`px-4 py-2 rounded-lg border transition-colors focus:outline-none focus:ring-2 ${
-            isDark 
-              ? 'border-gray-600 text-gray-300 hover:bg-gray-800 focus:ring-gray-600' 
-              : 'border-gray-300 text-gray-600 hover:bg-gray-50 focus:ring-gray-400'
-          }`}
-        >
-          Set Daily Goal
-        </button>
-      </div>
+      <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>
+        Study Progress
+      </h2>
 
-      {/* Overall Progress */}
+      
       <div className={`p-6 rounded-lg border ${
         isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
       }`}>
@@ -116,28 +94,7 @@ const ProgressTracker = ({ isDark }) => {
         </p>
       </div>
 
-      {/* Daily Goal */}
-      <div className={`p-4 rounded-lg border ${
-        isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
-      }`}>
-        <div className="flex items-center justify-between">
-          <div>
-            <h4 className={`font-medium ${isDark ? 'text-white' : 'text-black'}`}>
-              Daily Goal
-            </h4>
-            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              Complete {dailyGoal} chapters per day
-            </p>
-          </div>
-          <div className={`px-3 py-1 rounded-full text-sm ${
-            isDark ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-700'
-          }`}>
-            {dailyGoal} chapters/day
-          </div>
-        </div>
-      </div>
-
-      {/* Subject Progress */}
+      
       <div className="grid gap-4">
         <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-black'}`}>
           Subject-wise Progress
@@ -198,58 +155,6 @@ const ProgressTracker = ({ isDark }) => {
           );
         })}
       </div>
-
-      {/* Daily Goal Modal */}
-      {showGoalModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className={`max-w-md w-full rounded-lg p-6 ${
-            isDark ? 'bg-gray-900' : 'bg-white'
-          }`}>
-            <h3 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-black'}`}>
-              Set Daily Study Goal
-            </h3>
-            <div className="mb-4">
-              <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
-                Chapters per day
-              </label>
-              <input
-                type="number"
-                min="1"
-                max="20"
-                value={dailyGoal}
-                onChange={(e) => setDailyGoal(parseInt(e.target.value) || 1)}
-                className={`w-full px-4 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 ${
-                  isDark 
-                    ? 'bg-gray-800 border-gray-600 text-white focus:ring-gray-500' 
-                    : 'bg-white border-gray-300 text-gray-900 focus:ring-gray-400'
-                }`}
-              />
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={updateDailyGoal}
-                className={`flex-1 px-4 py-2 rounded-lg transition-colors focus:outline-none focus:ring-2 ${
-                  isDark 
-                    ? 'bg-white text-black hover:bg-gray-200 focus:ring-gray-600' 
-                    : 'bg-black text-white hover:bg-gray-800 focus:ring-gray-400'
-                }`}
-              >
-                Save Goal
-              </button>
-              <button
-                onClick={() => setShowGoalModal(false)}
-                className={`flex-1 px-4 py-2 rounded-lg border transition-colors focus:outline-none focus:ring-2 ${
-                  isDark 
-                    ? 'border-gray-600 text-gray-300 hover:bg-gray-800 focus:ring-gray-600' 
-                    : 'border-gray-300 text-gray-600 hover:bg-gray-50 focus:ring-gray-400'
-                }`}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

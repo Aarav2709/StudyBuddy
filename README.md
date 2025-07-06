@@ -1,25 +1,68 @@
-# StudyBuddy - CBSE Class 10 Study Platform
+# StudyBuddy
 
-A comprehensive, distraction-free study platform for CBSE Class 10 students featuring NCERT resources, curated notes, study tools, and more.
+A comprehensive, distraction-free study platform for CBSE Class 10 students featuring NCERT resources, interactive study tools, gamification, and advanced features to boost learning and retention.
 
-## Features
+## 🚀 New Enhanced Features
+
+### 📚 Interactive Learning Tools
+- **Flashcards System**: 200+ subject-wise flashcards with difficulty levels
+- **Quick Quiz Module**: Interactive quizzes with explanations and progress tracking
+- **Curated Notes**: 80+ high-quality notes from reputable educational sources
+
+### 🏆 Gamification & Motivation
+- **Achievement System**: 10+ unlockable achievements with point rewards
+- **Study Streak Tracker**: Daily habit tracking with visual progress
+- **Progress Levels**: From Beginner to Master Scholar based on points earned
+
+### ⏰ Smart Study Management
+- **Enhanced Pomodoro Timer**: Integrated with streak and achievement systems
+- **Study Reminders**: Customizable notifications for consistent study habits
+- **Advanced Analytics**: Detailed study statistics and performance insights
+
+### 🎯 Personalization
+- **Daily Study Goals**: Customizable time-based targets
+- **Bookmark System**: Save favorite resources and notes
+- **Study History**: Track all your learning activities
+- **Dark/Light Theme**: Comfortable studying in any environment
+
+## Core Features
 
 - 📚 **Complete NCERT Resources**: All subjects with official PDF links
-- 📝 **Curated Study Notes**: 80+ high-quality notes from reputable sources
-- ⏱️ **Pomodoro Timer**: Built-in study timer with session tracking
+- 📝 **Interactive Study Tools**: Flashcards, quizzes, and curated notes
+- ⏱️ **Smart Study Timer**: Pomodoro technique with achievement integration
+- 🏆 **Achievement System**: Gamified learning with rewards and levels
+- 🔥 **Study Streaks**: Build consistent study habits with daily tracking
+- 🔔 **Study Reminders**: Never miss a study session with smart notifications
 - 🔖 **Bookmarks & History**: Save and track your study progress
 - 🔍 **Advanced Search**: Find subjects, chapters, and notes quickly
-- 🌓 **Dark/Light Mode**: Comfortable studying in any environment
+- 📊 **Analytics Dashboard**: Detailed insights into your study patterns
 - 📱 **Responsive Design**: Works perfectly on all devices
 - ⚡ **Fast & Lightweight**: Built with Vite and React for optimal performance
 
 ## Subjects Covered
 
-- **Mathematics**: All 15 chapters from Real Numbers to Probability
+- **Mathematics**: All 15 chapters with flashcards and quizzes
 - **Science**: Physics, Chemistry, and Biology with comprehensive coverage
 - **English**: Literature analysis, writing skills, and grammar
 - **Hindi (Sparsh)**: Major poets, literary works, and language concepts
 - **Social Science**: History, Civics, Geography, and Economics
+
+## Student-Centric Enhancements
+
+### Achievement Levels
+- 🌱 **Beginner** (0-49 points): Just starting your journey
+- 🎯 **Rising Student** (50-149 points): Building good habits
+- 📚 **Dedicated Learner** (150-299 points): Consistent progress
+- 🏆 **Advanced Student** (300-499 points): Excellent dedication
+- 👑 **Master Scholar** (500+ points): Ultimate achievement
+
+### Study Features
+- **Daily Goal Setting**: Customize study time targets (15-120 minutes)
+- **Streak Building**: Track consecutive study days with visual calendar
+- **Smart Notifications**: Browser-based reminders for study sessions
+- **Progress Tracking**: Monitor time spent, sessions completed, and subjects studied
+- **Interactive Quizzes**: Timed questions with immediate feedback
+- **Flashcard Mastery**: Spaced repetition with difficulty-based filtering
 
 ## Quick Start
 

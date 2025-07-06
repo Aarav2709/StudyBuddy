@@ -1,5 +1,3 @@
-// Comprehensive Curated Notes for CBSE Class 10 - All Subjects
-// These are read-only notes from reputable educational sources
 export const curatedNotes = {
   mathematics: {
     "Real Numbers": [
@@ -918,23 +916,19 @@ export const curatedNotes = {
   }
 };
 
-// Helper function to get notes for a specific subject/chapter
 export const getCuratedNotes = (subject, chapter = null, subpart = null) => {
   try {
     let notes = [];
     
     if (subject === 'science') {
       if (subpart) {
-        // Handle specific science subpart
         const subpartData = curatedNotes.science[subpart];
         if (subpartData && chapter) {
           notes = subpartData[chapter] || [];
         } else if (subpartData) {
-          // Get all notes for the subpart
           notes = Object.values(subpartData).flat();
         }
       } else {
-        // Get all science notes from all subparts
         Object.keys(curatedNotes.science).forEach(subpartKey => {
           const subpartData = curatedNotes.science[subpartKey];
           const subpartNotes = Object.values(subpartData).flat();
@@ -945,7 +939,6 @@ export const getCuratedNotes = (subject, chapter = null, subpart = null) => {
       }
     } else if (subject === 'socialScience') {
       if (subpart) {
-        // Handle specific social science subpart
         const subpartData = curatedNotes.socialScience[subpart];
         if (subpartData && chapter) {
           notes = subpartData.filter(note => note.tags.some(tag => 
@@ -955,7 +948,6 @@ export const getCuratedNotes = (subject, chapter = null, subpart = null) => {
           notes = subpartData;
         }
       } else {
-        // Get all social science notes from all subparts
         Object.keys(curatedNotes.socialScience).forEach(subpartKey => {
           const subpartData = curatedNotes.socialScience[subpartKey];
           subpartData.forEach(note => {
@@ -964,10 +956,8 @@ export const getCuratedNotes = (subject, chapter = null, subpart = null) => {
         });
       }
     } else {
-      // Handle other subjects
       const subjectData = curatedNotes[subject];
       if (Array.isArray(subjectData)) {
-        // Subject has direct array of notes (like English)
         if (chapter) {
           notes = subjectData.filter(note => note.tags.some(tag => 
             chapter.toLowerCase().includes(tag.toLowerCase())
@@ -976,10 +966,8 @@ export const getCuratedNotes = (subject, chapter = null, subpart = null) => {
           notes = subjectData;
         }
       } else if (subjectData && chapter) {
-        // Subject has chapter-wise notes (like Mathematics)
         notes = subjectData[chapter] || [];
       } else if (subjectData) {
-        // Get all notes for the subject
         notes = Object.values(subjectData).flat();
       }
     }
@@ -991,12 +979,10 @@ export const getCuratedNotes = (subject, chapter = null, subpart = null) => {
   }
 };
 
-// Helper function to search across all curated notes
 export const searchCuratedNotes = (searchTerm) => {
   const allNotes = [];
   const term = searchTerm.toLowerCase();
   
-  // Helper to add notes with subject info
   const addNotes = (notes, subject, subpart = null) => {
     notes.forEach(note => {
       if (
@@ -1013,22 +999,17 @@ export const searchCuratedNotes = (searchTerm) => {
     });
   };
   
-  // Search in all subjects
   Object.keys(curatedNotes).forEach(subject => {
     const subjectData = curatedNotes[subject];
     
     if (Array.isArray(subjectData)) {
-      // Direct array of notes (like English, Hindi)
       addNotes(subjectData, subject);
     } else if (subject === 'science' || subject === 'socialScience') {
-      // Subjects with subparts
       Object.keys(subjectData).forEach(subpart => {
         const subpartData = subjectData[subpart];
         if (Array.isArray(subpartData)) {
-          // Direct array (like socialScience subparts)
           addNotes(subpartData, subject, subpart);
         } else {
-          // Nested structure (like science subparts)
           Object.values(subpartData).flat().forEach(notesList => {
             if (Array.isArray(notesList)) {
               addNotes(notesList, subject, subpart);
@@ -1037,7 +1018,6 @@ export const searchCuratedNotes = (searchTerm) => {
         }
       });
     } else {
-      // Chapter-wise structure (like Mathematics)
       Object.values(subjectData).flat().forEach(notesList => {
         if (Array.isArray(notesList)) {
           addNotes(notesList, subject);

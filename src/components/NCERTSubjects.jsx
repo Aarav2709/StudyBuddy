@@ -159,7 +159,6 @@ const SubjectCard = ({ subject, subjectKey, isOpen, onToggle, isDark, searchTerm
       date: new Date().toISOString()
     };
     
-    // Check if already bookmarked
     const exists = bookmarks.some(b => b.title === chapter.name && b.subject === subjectName);
     if (!exists) {
       bookmarks.unshift(bookmark);
@@ -177,15 +176,12 @@ const SubjectCard = ({ subject, subjectKey, isOpen, onToggle, isDark, searchTerm
       date: new Date().toISOString()
     };
     
-    // Remove duplicate if exists
     const filteredHistory = history.filter(h => !(h.title === chapter.name && h.subject === subjectName));
     filteredHistory.unshift(historyItem);
     
-    // Keep only last 50 items
     const limitedHistory = filteredHistory.slice(0, 50);
     storage.set('studybuddy-history', limitedHistory);
     
-    // Update study history for streaks
     const studyHistory = storage.get('studybuddy-study-history', []);
     const today = new Date().toDateString();
     const todayExists = studyHistory.some(entry => new Date(entry.date).toDateString() === today);
@@ -237,7 +233,6 @@ const SubjectCard = ({ subject, subjectKey, isOpen, onToggle, isDark, searchTerm
             : 'bg-white border-gray-200'
         }`}>
           {subject.subparts ? (
-            // Science with subparts (Physics, Chemistry, Biology)
             <div className="space-y-6">
               {Object.entries(subject.subparts).map(([subpartKey, subpart]) => {
                 const filteredSubpartChapters = filteredChapters(subpart.chapters);
@@ -297,7 +292,6 @@ const SubjectCard = ({ subject, subjectKey, isOpen, onToggle, isDark, searchTerm
               })}
             </div>
           ) : (
-            // Regular subjects with direct chapters
             <div className="space-y-3">
               {filteredChapters(subject.chapters).map((chapter, index) => (
                 <div key={index} className={`flex justify-between items-center py-2 border-b last:border-b-0 ${
@@ -361,7 +355,6 @@ const NCERTSubjects = ({ searchTerm, isDark }) => {
     }));
   };
 
-  // Filter subjects based on search term
   const getFilteredSubjects = () => {
     if (!searchTerm) return subjectsData;
     
@@ -391,10 +384,10 @@ const NCERTSubjects = ({ searchTerm, isDark }) => {
 
   return (
     <div className="space-y-6">
-      {/* Study Timer */}
+      
       <StudyTimer isDark={isDark} />
       
-      {/* Subjects List */}
+      
       <div className="space-y-4">
         {Object.keys(filteredSubjects).length === 0 ? (
           <div className={`text-center py-12 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>

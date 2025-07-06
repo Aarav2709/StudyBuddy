@@ -15,7 +15,6 @@ const StudyTimer = ({ isDark }) => {
   });
 
   useEffect(() => {
-    // Load timer settings
     const savedSettings = {
       pomodoroLength: storage.get('studybuddy-pomodoro-length', 25),
       shortBreakLength: storage.get('studybuddy-short-break', 5),
@@ -34,13 +33,11 @@ const StudyTimer = ({ isDark }) => {
         setTime(time => time - 1);
       }, 1000);
     } else if (time === 0) {
-      // Timer finished
       if (settings.soundEnabled) {
         timerUtils.playNotificationSound();
       }
       setIsRunning(false);
       
-      // Save timer session
       const timerSessions = storage.get('studybuddy-timer-sessions', []);
       const sessionData = {
         date: new Date().toISOString(),
@@ -52,13 +49,31 @@ const StudyTimer = ({ isDark }) => {
       timerSessions.push(sessionData);
       storage.set('studybuddy-timer-sessions', timerSessions);
       
+      if (!isBreak) {
+        const timerHistory = storage.get('studybuddy-timer-history', []);
+        const today = new Date().toISOString().split('T')[0];
+        const existingToday = timerHistory.find(entry => entry.date.startsWith(today));
+        
+        if (existingToday) {
+          existingToday.duration += settings.pomodoroLength;
+          existingToday.sessions += 1;
+        } else {
+          timerHistory.push({
+            date: new Date().toISOString(),
+            duration: settings.pomodoroLength,
+            sessions: 1
+          });
+        }
+        storage.set('studybuddy-timer-history', timerHistory);
+        
+        updateStudyStats();
+      }
+      
       if (isBreak) {
-        // Break finished, start new work session
         setIsBreak(false);
         setTime(settings.pomodoroLength * 60);
         setSessions(prev => prev + 1);
       } else {
-        // Work session finished, start break
         setIsBreak(true);
         const isLongBreak = sessions % settings.sessionsBeforeLongBreak === 3;
         setTime((isLongBreak ? settings.longBreakLength : settings.shortBreakLength) * 60);
@@ -101,6 +116,25 @@ const StudyTimer = ({ isDark }) => {
     return ((totalTime - time) / totalTime) * 100;
   };
 
+  const updateStudyStats = () => {
+    const stats = storage.get('studybuddy-study-stats', {});
+    const now = new Date();
+    const hour = now.getHours();
+    
+    stats.totalSessions = (stats.totalSessions || 0) + 1;
+    stats.totalTime = (stats.totalTime || 0) + settings.pomodoroLength;
+    
+    if (hour < 8) {
+      stats.earlySessions = (stats.earlySessions || 0) + 1;
+    } else if (hour >= 22) {
+      stats.lateSessions = (stats.lateSessions || 0) + 1;
+    }
+    
+    stats.subjectsStudied = Math.min((stats.subjectsStudied || 0) + 0.2, 5);
+    
+    storage.set('studybuddy-study-stats', stats);
+  };
+
   return (
     <div className={`p-4 rounded-lg border ${
       isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
@@ -115,7 +149,7 @@ const StudyTimer = ({ isDark }) => {
           }
         </h3>
         
-        {/* Progress Ring */}
+        
         <div className="relative w-24 h-24 mx-auto mb-4">
           <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
             <path
